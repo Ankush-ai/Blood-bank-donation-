@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Ensure the backend URL matches where the PHP files are served.
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://blood-bank-donation.onrender.com';
 
 const api = axios.create({
   baseURL: API_URL,

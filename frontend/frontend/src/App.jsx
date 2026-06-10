@@ -13,7 +13,7 @@ function App() {
   return (
     <Router>
       <Navbar />
-      <div className="container" style={{ padding: '20px' }}>
+      <div className="container">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />

@@ -1,36 +1,55 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getAvailableSamples } from '../services/api';
 
 const BloodInfo = () => {
-  const [inventory] = useState([
-    { id: 1, bloodGroup: 'A+', quantity: 15 },
-    { id: 2, bloodGroup: 'O-', quantity: 8 },
-    { id: 3, bloodGroup: 'B+', quantity: 12 },
-    { id: 4, bloodGroup: 'AB+', quantity: 4 },
-  ]);
+  const [inventory, setInventory] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchInventory = async () => {
+      try {
+        const response = await getAvailableSamples();
+        setInventory(response.data || []);
+      } catch (error) {
+        console.error("Failed to fetch inventory", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInventory();
+  }, []);
+
+  if (loading) return <div className="page-wrapper" style={{ textAlign: 'center', marginTop: '3rem' }}>Loading inventory...</div>;
 
   return (
-    <div className="blood-info-container">
-      <h2>Current Blood Inventory</h2>
-      {inventory.length === 0 ? (
-        <p>No blood available in the inventory at the moment.</p>
-      ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
-          <thead>
-            <tr style={{ backgroundColor: '#f4f4f4', textAlign: 'left' }}>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Blood Group</th>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Quantity (Units)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {inventory.map((item) => (
-              <tr key={item.id}>
-                <td style={{ padding: '10px', border: '1px solid #ddd' }}>{item.bloodGroup}</td>
-                <td style={{ padding: '10px', border: '1px solid #ddd' }}>{item.quantity}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+    <div className="page-wrapper">
+      <div className="glass-card">
+        <h2 style={{ color: 'var(--primary-color)', marginBottom: '1.5rem' }}>Global Blood Inventory</h2>
+        <p style={{ marginBottom: '1.5rem' }}>This shows all available blood samples across all hospitals.</p>
+        
+        {inventory.length === 0 ? (
+          <p>No blood available in the inventory at the moment.</p>
+        ) : (
+          <div className="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Hospital</th>
+                  <th>Blood Group</th>
+                </tr>
+              </thead>
+              <tbody>
+                {inventory.map((item) => (
+                  <tr key={item.sample_id}>
+                    <td>{item.hospital_name}</td>
+                    <td><span className="status-badge status-available">{item.blood_group}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

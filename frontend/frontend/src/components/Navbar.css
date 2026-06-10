@@ -1,47 +1,102 @@
 .navbar {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
-  background-color: #d32f2f;
-  color: white;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: var(--shadow-sm);
 }
-.navbar a {
-  color: white;
-  text-decoration: none;
-  margin-left: 1.5rem;
-  font-weight: 500;
-  transition: opacity 0.2s;
-}
-.navbar a:hover {
-  opacity: 0.8;
-}
+
 .navbar-brand a {
   font-size: 1.5rem;
   font-weight: 700;
-  margin-left: 0;
+  color: var(--primary-color);
+  text-decoration: none;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
+
+.navbar-brand a::before {
+  content: '🩸';
+  font-size: 1.2rem;
+}
+
 .navbar-links {
   display: flex;
   align-items: center;
+  gap: 1.5rem;
 }
+
+.navbar-links a {
+  color: var(--text-dark);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  position: relative;
+  padding: 0.5rem 0;
+  transition: var(--transition);
+}
+
+.navbar-links a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--primary-color);
+  transition: var(--transition);
+}
+
+.navbar-links a:hover {
+  color: var(--primary-color);
+}
+
+.navbar-links a:hover::after {
+  width: 100%;
+}
+
 .navbar-greeting {
-  margin-right: 1.5rem;
-  font-size: 0.9rem;
-  opacity: 0.9;
+  font-weight: 600;
+  color: var(--secondary-color);
+  margin-right: 1rem;
 }
+
 .btn-logout {
-  background-color: transparent;
-  border: 1px solid white;
-  color: white;
-  padding: 0.4rem 0.8rem;
-  margin-left: 1.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
+  background-color: #F8F9FA;
+  color: var(--text-dark);
+  box-shadow: none;
+  border: 1px solid #E2E8F0;
+  padding: 0.5rem 1rem;
 }
+
 .btn-logout:hover {
-  background-color: white;
-  color: #d32f2f;
+  background-color: #F1F5F9;
+  color: var(--danger-color);
+  border-color: var(--danger-color);
+  transform: none;
+  box-shadow: none;
+}
+
+/* Responsive Navbar */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .navbar-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
 }

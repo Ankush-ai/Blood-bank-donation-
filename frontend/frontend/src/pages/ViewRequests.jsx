@@ -1,65 +1,77 @@
 import { useState, useEffect } from 'react';
+import { getHospitalRequests } from '../services/api';
+import { getUser } from '../utils/auth';
 
 const ViewRequests = () => {
   const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const user = getUser();
 
   useEffect(() => {
-    // TODO: Fetch requests from backend API for this hospital
-    // Mock data for initial rendering
-    const mockRequests = [
-      { id: 1, receiverName: 'Alice Smith', bloodGroup: 'O+', quantity: 2, status: 'Pending' },
-      { id: 2, receiverName: 'Bob Jones', bloodGroup: 'AB-', quantity: 1, status: 'Pending' },
-    ];
-    
-    // Use setTimeout to defer state update and avoid cascading renders
-    const timer = setTimeout(() => {
-      setRequests(mockRequests);
-    }, 0);
-    
-    return () => clearTimeout(timer);
+    const fetchRequests = async () => {
+      try {
+        const response = await getHospitalRequests(user?.hospital_id);
+        setRequests(response.data || []);
+      } catch (error) {
+        console.error("Failed to fetch requests", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRequests();
   }, []);
 
   const handleUpdateStatus = (id, newStatus) => {
-    // TODO: Update status in backend API via PUT/PATCH request
-    setRequests(requests.map(req => req.id === id ? { ...req, status: newStatus } : req));
+    // The backend does not currently have an endpoint for updating the status of a request.
+    // Simulating the update on the frontend for UI purposes.
+    alert(`Request ${newStatus}! (Note: Backend endpoint for status updates is not yet implemented)`);
+    setRequests(requests.map(req => req.id === id ? { ...req, status: newStatus.toLowerCase() } : req));
   };
 
+  if (loading) return <div className="page-wrapper" style={{ textAlign: 'center', marginTop: '3rem' }}>Loading requests...</div>;
+
   return (
-    <div className="view-requests-container">
-      <h2>Blood Requests</h2>
-      {requests.length === 0 ? (
-        <p>No requests at the moment.</p>
-      ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
-          <thead>
-            <tr style={{ backgroundColor: '#f4f4f4', textAlign: 'left' }}>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Receiver</th>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Blood Group</th>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Quantity</th>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Status</th>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {requests.map((req) => (
-              <tr key={req.id}>
-                <td style={{ padding: '10px', border: '1px solid #ddd' }}>{req.receiverName}</td>
-                <td style={{ padding: '10px', border: '1px solid #ddd' }}>{req.bloodGroup}</td>
-                <td style={{ padding: '10px', border: '1px solid #ddd' }}>{req.quantity}</td>
-                <td style={{ padding: '10px', border: '1px solid #ddd' }}>{req.status}</td>
-                <td style={{ padding: '10px', border: '1px solid #ddd' }}>
-                  {req.status === 'Pending' && (
-                    <>
-                      <button onClick={() => handleUpdateStatus(req.id, 'Approved')} style={{ marginRight: '10px', backgroundColor: 'green', color: 'white', padding: '5px 10px', border: 'none', cursor: 'pointer' }}>Approve</button>
-                      <button onClick={() => handleUpdateStatus(req.id, 'Rejected')} style={{ backgroundColor: 'red', color: 'white', padding: '5px 10px', border: 'none', cursor: 'pointer' }}>Reject</button>
-                    </>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+    <div className="page-wrapper">
+      <div className="glass-card">
+        <h2 style={{ color: 'var(--primary-color)', marginBottom: '1.5rem' }}>Blood Requests</h2>
+        {requests.length === 0 ? (
+          <p>No requests at the moment.</p>
+        ) : (
+          <div className="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Receiver Name</th>
+                  <th>Blood Group</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {requests.map((req) => (
+                  <tr key={req.id}>
+                    <td>{req.receiver_name}</td>
+                    <td><span className="status-badge status-available">{req.blood_group}</span></td>
+                    <td>
+                      <span className={`status-badge status-${req.status.toLowerCase()}`}>
+                        {req.status}
+                      </span>
+                    </td>
+                    <td>
+                      {req.status.toLowerCase() === 'pending' && (
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                          <button onClick={() => handleUpdateStatus(req.id, 'Approved')} style={{ backgroundColor: 'var(--success-color)', padding: '0.5rem 1rem', fontSize: '0.85rem' }}>Approve</button>
+                          <button onClick={() => handleUpdateStatus(req.id, 'Rejected')} style={{ backgroundColor: 'var(--danger-color)', padding: '0.5rem 1rem', fontSize: '0.85rem' }}>Reject</button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
