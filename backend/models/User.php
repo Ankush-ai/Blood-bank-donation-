@@ -18,10 +18,11 @@ class User {
             $this->conn->beginTransaction();
 
             $hash = password_hash($data->password, PASSWORD_BCRYPT);
-            $stmt = $this->conn->prepare("INSERT INTO users (email, password, role) VALUES (:email, :password, :role)");
+            $stmt = $this->conn->prepare("INSERT INTO users (email, password, role) VALUES (:email, :password, :role) RETURNING id");
             $stmt->execute([':email' => $data->email, ':password' => $hash, ':role' => $data->role]);
             
-            $userId = $this->conn->lastInsertId();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $userId = $row['id'];
 
             if ($data->role === 'hospital') {
                 $stmt = $this->conn->prepare("INSERT INTO hospitals (user_id, hospital_name, address) VALUES (:uid, :name, :addr)");
